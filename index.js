@@ -18,11 +18,10 @@ app.post('/send_message', (req, res) => {
   try {
     const { message, number } = req.body
     if (!message) throw new Error('No message found!')
-    if (!number.replace(/[^0-9]/, '').match(/^[0-9]{11}$/g))
+    if (!number.replace(/[^0-9]/, '').match(/^[0-9]{10,11}$/g))
       throw new Error('Invalid number format!')
-    const formattedNumber = number.slice(0, 2) + number.slice(3)
-    console.log(`Request received (${formattedNumber}): ${message}`)
-    sqliteService.saveMessage(formattedNumber, message)
+    console.log(`Request received (${number}): ${message}`)
+    sqliteService.saveMessage(number, message)
   } catch (error) {
     response.message = error.message || 'Could not send message'
     response.status = false
