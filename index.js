@@ -9,12 +9,9 @@ const whatsappService = new WhatsappService()
 const SqliteService = require('./src/services/sqlite-service')
 const sqliteService = new SqliteService()
 
+const ApiResponse = require('./src/models/api-response')
+
 app.post('/send_message', (req, res) => {
-  const response = {
-    data: [],
-    message: 'Message sended successful!',
-    status: true
-  }
   try {
     const { message, number } = req.body
     if (!message) throw new Error('No message found!')
@@ -23,10 +20,10 @@ app.post('/send_message', (req, res) => {
     console.log(`Request received (${number}): ${message}`)
     sqliteService.saveMessage(number, message)
   } catch (error) {
-    response.message = error.message || 'Could not send message'
-    response.status = false
+    ApiResponse.message = error.message || 'Could not send message'
+    ApiResponse.status = false
   } finally {
-    res.json(response)
+    res.json(ApiResponse)
   }
 })
 
