@@ -10,6 +10,8 @@ const SqliteService = require('./src/services/sqlite-service')
 const sqliteService = new SqliteService()
 
 const ApiResponse = require('./src/models/api-response')
+const Tools = require('./src/utils/tools')
+const { randomIntNumber } = require('./src/utils/tools')
 
 app.post('/send_message', (req, res) => {
   try {
@@ -27,17 +29,30 @@ app.post('/send_message', (req, res) => {
   }
 })
 
-setInterval(() => {
-  const messages = sqliteService.getUnsendedMessages()
-  console.log(`Unsended messages: ${messages?.length}`)
-  if (!messages?.length) return
-  const ids = messages.map(message => message.id)
-  console.log(`Sending message(s) with id(s): ${ids.join(',')}`)
-  sqliteService.updateMessagesSendAtTime(ids)
-  messages?.forEach(message => {
-    console.log(`Sending message to (${message.number}): ${message.message}`)
-    whatsappService.sendMessage(`55${message.number}@c.us`, message.message)
-  })
-}, 10000)
-
 app.listen(3000)
+
+async function unsendedMessagesHandler() {
+  const messages = sqliteService.getUnsentMessages()
+  console.log(`${new Date().toISOString()}: ${messages?.length || 0} unsent message(s)`)
+  if (messages?.length) {
+    console.log(`Sending them...`)
+    let success = 0
+    let fails = 0
+    messages?.forEach(async message => {
+      try {
+        await whatsappService.sendMessage(message.number, message.message)
+        sqliteService.updateMessageSentAtTime(message.id)
+        console.log(`Message sent successfully: (${message.number}) ${message.message}`)
+        success += 1
+        await Tools.sleep(3, 7)
+      } catch (error) {
+        console.error(`Fail to send message: (${message.number}) ${message.message}: ${error.message || 'unknown'}`)
+        fails += 1
+      }
+    })
+    console.log(`Success: ${success}, Fails: ${fails}`)
+  }
+  return setTimeout(unsendedMessagesHandler, 2000)
+}
+
+unsendedMessagesHandler()

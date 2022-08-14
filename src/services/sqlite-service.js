@@ -18,19 +18,19 @@ class SqliteService {
     return insert.run(new Date().toISOString(), receiverNumber, messageContent)
   }
 
-  getUnsendedMessages() {
-    const select = this.#db.prepare("SELECT * FROM messages WHERE sendedAt IS NULL").all()
+  getUnsentMessages() {
+    const select = this.#db.prepare("SELECT * FROM messages WHERE sentAt IS NULL").all()
     return select
   }
 
   /**
-   * Update sendedAt
-   * @param sendedMessagesIds array
+   * Update sentAt
+   * @param UnsentMessageId number
    * @returns BetterSqlite3.RunResult
    */
-  updateMessagesSendAtTime(sendedMessagesIds) {
-    const update = this.#db.prepare(`UPDATE messages SET sendedAt = ? WHERE id IN(${sendedMessagesIds.join(',')})`)
-    return update.run(new Date().toISOString())
+  updateMessageSentAtTime(unsentMessageId) {
+    const update = this.#db.prepare(`UPDATE messages SET sentAt = ? WHERE id = ?`)
+    return update.run(new Date().toISOString(), unsentMessageId)
   }
 }
 

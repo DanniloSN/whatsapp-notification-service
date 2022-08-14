@@ -1,7 +1,7 @@
 CREATE TABLE messages (
-  id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   createdAt TEXT NOT NULL,
-  sendedAt TEXT,
+  sentAt TEXT,
   number TEXT NOT NULL,
   message TEXT NOT NULL,
   attachment BLOB
