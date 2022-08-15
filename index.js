@@ -38,7 +38,8 @@ async function unsendedMessagesHandler() {
     console.log(`Sending them...`)
     let success = 0
     let fails = 0
-    messages?.forEach(async message => {
+    for (let i = 0; i < messages.length; i++) {
+      const message = messages[i]
       try {
         await whatsappService.sendMessage(message.number, message.message)
         sqliteService.updateMessageSentAtTime(message.id)
@@ -46,13 +47,13 @@ async function unsendedMessagesHandler() {
         success += 1
         await Tools.sleep(3, 7)
       } catch (error) {
-        console.error(`Fail to send message: (${message.number}) ${message.message}: ${error.message || 'unknown'}`)
+        console.error(`Fail to send message: (${message?.number}) ${message?.message}: ${error?.message || 'unknown'}`)
         fails += 1
       }
-    })
+    }
     console.log(`Success: ${success}, Fails: ${fails}`)
   }
-  return setTimeout(unsendedMessagesHandler, 2000)
+  return setTimeout(unsendedMessagesHandler, 1000)
 }
 
 unsendedMessagesHandler()
