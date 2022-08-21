@@ -11,7 +11,6 @@ const sqliteService = new SqliteService()
 
 const ApiResponse = require('./src/models/api-response')
 const Tools = require('./src/utils/tools')
-const { randomIntNumber } = require('./src/utils/tools')
 
 app.post('/send_message', (req, res) => {
   try {
